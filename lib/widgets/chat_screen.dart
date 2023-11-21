@@ -1,21 +1,25 @@
+import 'package:chargpt/states/message_state.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../models/message.dart';
 
-class ChatScreen extends StatelessWidget {
-  final List<Message> messages = [
-    Message(content: 'hello', isUser: true, timestamp: DateTime.now()),
-    Message(content: 'How are you ?', isUser: false, timestamp: DateTime.now()),
-    Message(content: 'Fine, thank you, and you ?', isUser: true, timestamp: DateTime.now()),
-    Message(content: 'I am fine.', isUser: false, timestamp: DateTime.now()),
-  ];
+class ChatScreen extends HookConsumerWidget {
+  // final List<Message> messages = [
+  //   Message(content: 'hello', isUser: true, timestamp: DateTime.now()),
+  //   Message(content: 'How are you ?', isUser: false, timestamp: DateTime.now()),
+  //   Message(content: 'Fine, thank you, and you ?', isUser: true, timestamp: DateTime.now()),
+  //   Message(content: 'I am fine.', isUser: false, timestamp: DateTime.now()),
+  // ];
 
   final _textController = TextEditingController();
 
   ChatScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final messages = ref.watch(messageProvider); // 获取数据
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat'),
@@ -45,7 +49,7 @@ class ChatScreen extends StatelessWidget {
                 suffixIcon: IconButton(
                   onPressed: () {
                     if(_textController.text.isNotEmpty) {
-                      _sentMessage(_textController.text);
+                      _sentMessage(ref, _textController.text);
                     }
                   },
                   icon: const Icon(Icons.send),
@@ -58,14 +62,15 @@ class ChatScreen extends StatelessWidget {
     );
   }
 
-  _sentMessage(String content) {
+  _sentMessage(WidgetRef ref, String content) {
     final message = Message(
       content: content,
       isUser: true,
       timestamp: DateTime.now(),
     );
 
-    messages.add(message);
+    // messages.add(message);
+    ref.read(messageProvider.notifier).addMessage(message); // 添加消息
     _textController.clear();
   }
 }
