@@ -1,15 +1,17 @@
+import 'package:chargpt/markdown/latex.dart';
 import 'package:chargpt/services/injection.dart';
 import 'package:chargpt/states/chat_ui_state.dart';
 import 'package:chargpt/states/message_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:markdown_widget/config/all.dart';
 
 import '../models/message.dart';
 
 class ChatScreen extends HookConsumerWidget {
 
-  ChatScreen({super.key});
+  const ChatScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -91,11 +93,35 @@ class MessageItem extends StatelessWidget {
         ),
         Flexible(
             child: Container(
-                margin: const EdgeInsets.only(top: 12),
-                child: Text(message.content)
+                margin: const EdgeInsets.only(right: 48),
+                child: MessageContentWidget(message: message)
             )
         ),
       ],
+    );
+  }
+}
+
+class MessageContentWidget extends StatelessWidget {
+  const MessageContentWidget({
+    super.key,
+    required this.message,
+  });
+
+  final Message message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: MarkdownGenerator(
+        generators: [
+          latexGenerator,
+        ],
+        inlineSyntaxList: [
+          LatexSyntax(),
+        ]
+      ).buildWidgets(message.content),
     );
   }
 }
