@@ -1,3 +1,5 @@
+import 'package:chargpt/services/injection.dart';
+import 'package:chargpt/states/chat_ui_state.dart';
 import 'package:chargpt/states/message_state.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -19,6 +21,7 @@ class ChatScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final messages = ref.watch(messageProvider); // 获取数据
+    final chatUiState = ref.watch(chatUiStateProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -43,6 +46,7 @@ class ChatScreen extends HookConsumerWidget {
 
             // 聊天输入框
             TextField(
+              enabled: !chatUiState.requestLoading, // 处于请求未响应状态，输入框静止
               controller: _textController,
               decoration: InputDecoration(
                 hintText: 'Type a message', // 显示在输入框的提示文字
@@ -69,9 +73,35 @@ class ChatScreen extends HookConsumerWidget {
       timestamp: DateTime.now(),
     );
 
-    // messages.add(message);
-    ref.read(messageProvider.notifier).addMessage(message); // 添加消息
+    // 添加用户的提问消息
+    ref.read(messageProvider.notifier).addMessage(message);
     _textController.clear();
+
+    // 添加 gpt 的回答消息
+    _requestChatGPT(ref, content);
+  }
+
+  _requestChatGPT(WidgetRef ref, String content) async {
+    ref.read(chatUiStateProvider.notifier).setRequestLoading(true);
+
+    try {
+      final res = await chatgpt.sendChat(content);
+      ref.read(chatUiStateProvider.notifier).setRequestLoading(false);
+
+      final text = res.choices.first.message?.content ?? '';
+      final message = Message(
+        content: text,
+        isUser: false,
+        timestamp: DateTime.now(),
+      );
+
+      // 把 gpt 的 message 添加到 messages 消息列表
+      ref.read(messageProvider.notifier).addMessage(message);
+    } catch(err) {
+      print(err);
+    } finally {
+      ref.read(chatUiStateProvider.notifier).setRequestLoading(false);
+    }
   }
 }
 
@@ -86,6 +116,8 @@ class MessageItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         CircleAvatar(
           backgroundColor: message.isUser ?
@@ -97,7 +129,12 @@ class MessageItem extends StatelessWidget {
         const SizedBox(
           width: 8,
         ),
-        Text(message.content),
+        Flexible(
+            child: Container(
+                margin: const EdgeInsets.only(top: 12),
+                child: Text(message.content)
+            )
+        ),
       ],
     );
   }
