@@ -98,7 +98,7 @@ class ChatScreen extends HookConsumerWidget {
       // 把 gpt 的 message 添加到 messages 消息列表
       ref.read(messageProvider.notifier).addMessage(message);
     } catch(err) {
-      print(err);
+      logger.e('requestChatGPT error: $err', error: err);
     } finally {
       ref.read(chatUiStateProvider.notifier).setRequestLoading(false);
     }

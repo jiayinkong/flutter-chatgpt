@@ -22,8 +22,6 @@ class ChatGPTService {
       ]
     );
 
-    print('......${request}......');
-
     return await client.sendChatCompletion(request);
   }
 }
