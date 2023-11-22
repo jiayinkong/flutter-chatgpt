@@ -7,13 +7,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../models/message.dart';
 
 class ChatScreen extends HookConsumerWidget {
-  // final List<Message> messages = [
-  //   Message(content: 'hello', isUser: true, timestamp: DateTime.now()),
-  //   Message(content: 'How are you ?', isUser: false, timestamp: DateTime.now()),
-  //   Message(content: 'Fine, thank you, and you ?', isUser: true, timestamp: DateTime.now()),
-  //   Message(content: 'I am fine.', isUser: false, timestamp: DateTime.now()),
-  // ];
-
   final _textController = TextEditingController();
 
   ChatScreen({super.key});
@@ -86,21 +79,6 @@ class ChatScreen extends HookConsumerWidget {
     ref.read(chatUiStateProvider.notifier).setRequestLoading(true);
 
     try {
-      // final res = await chatgpt.sendChat(content);
-      // ref.read(chatUiStateProvider.notifier).setRequestLoading(false);
-      //
-      // final text = res.choices.first.message?.content ?? '';
-      // final message = Message(
-      //   id: uuid.v4(),
-      //   content: text,
-      //   isUser: false,
-      //   timestamp: DateTime.now(),
-      // );
-      //
-      // // 把 gpt 的 message 添加到 messages 消息列表
-      // ref.read(messageProvider.notifier).upsertMessage(message);
-
-
       // gpt 的消息以流的形式响应回来
       final id = uuid.v4();
       await chatgpt.streamChat(
