@@ -68,13 +68,14 @@ class ChatScreen extends HookConsumerWidget {
 
   _sentMessage(WidgetRef ref, String content) {
     final message = Message(
+      id: uuid.v4(),
       content: content,
       isUser: true,
       timestamp: DateTime.now(),
     );
 
     // 添加用户的提问消息
-    ref.read(messageProvider.notifier).addMessage(message);
+    ref.read(messageProvider.notifier).upsertMessage(message);
     _textController.clear();
 
     // 添加 gpt 的回答消息
@@ -85,18 +86,36 @@ class ChatScreen extends HookConsumerWidget {
     ref.read(chatUiStateProvider.notifier).setRequestLoading(true);
 
     try {
-      final res = await chatgpt.sendChat(content);
-      ref.read(chatUiStateProvider.notifier).setRequestLoading(false);
+      // final res = await chatgpt.sendChat(content);
+      // ref.read(chatUiStateProvider.notifier).setRequestLoading(false);
+      //
+      // final text = res.choices.first.message?.content ?? '';
+      // final message = Message(
+      //   id: uuid.v4(),
+      //   content: text,
+      //   isUser: false,
+      //   timestamp: DateTime.now(),
+      // );
+      //
+      // // 把 gpt 的 message 添加到 messages 消息列表
+      // ref.read(messageProvider.notifier).upsertMessage(message);
 
-      final text = res.choices.first.message?.content ?? '';
-      final message = Message(
-        content: text,
-        isUser: false,
-        timestamp: DateTime.now(),
+
+      // gpt 的消息以流的形式响应回来
+      final id = uuid.v4();
+      await chatgpt.streamChat(
+        content,
+        onSuccess: (text) {
+          final message = Message(
+            id: id,
+            content: text,
+            timestamp: DateTime.now(),
+            isUser: false,
+          );
+
+          ref.read(messageProvider.notifier).upsertMessage(message);
+        }
       );
-
-      // 把 gpt 的 message 添加到 messages 消息列表
-      ref.read(messageProvider.notifier).addMessage(message);
     } catch(err) {
       logger.e('requestChatGPT error: $err', error: err);
     } finally {
