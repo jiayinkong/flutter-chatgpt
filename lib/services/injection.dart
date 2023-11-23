@@ -1,3 +1,4 @@
+import '/data/dao/database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
@@ -11,3 +12,6 @@ final chatgpt = ChatGPTService();
 final logger = Logger(level: kDebugMode ? Level.trace : Level.info);
 
 const uuid = Uuid();
+
+// 定义全局变量，方便其他地方使用
+late AppDatabase db;
