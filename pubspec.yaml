@@ -46,6 +46,8 @@ dependencies:
   markdown_widget: ^2.3.1
   flutter_math_fork: ^0.7.2
   markdown: ^7.1.1
+  floor: ^1.4.2
+  sqflite: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +65,7 @@ dev_dependencies:
   riverpod_lint: ^2.1.1
   freezed: ^2.4.5
   json_serializable: ^6.7.1
+  floor_generator: ^1.4.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
