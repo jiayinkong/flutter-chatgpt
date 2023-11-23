@@ -1,4 +1,4 @@
-import '/data/dao/database.dart';
+import 'data/database.dart';
 import '/services/injection.dart';
 import '/widgets/chat_screen.dart';
 import 'package:flutter/material.dart';
