@@ -21,12 +21,12 @@ class MessageList extends StateNotifier<List<Message>> {
       message = partialMessage.copyWith(
         content: msg.content + partialMessage.content
       );
-
-      logger.d('message id ${message.toString()}');
-
-      // update db
-      db.messageDao.upsertMessage(message); // 消息插入数据库中
     }
+
+    logger.d('message id ${message.toString()}');
+
+    // update db
+    db.messageDao.upsertMessage(message); // 消息插入数据库中
 
     if(index == -1) {
       state = [...state, message];
