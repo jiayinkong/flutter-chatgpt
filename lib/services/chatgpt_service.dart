@@ -1,6 +1,6 @@
-import 'package:chargpt/env.dart';
-import 'package:chargpt/models/message.dart';
 import 'package:openai_api/openai_api.dart';
+
+import '../env.dart';
 
 class ChatGPTService {
   final client = OpenaiClient(

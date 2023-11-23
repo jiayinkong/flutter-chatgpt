@@ -1,10 +1,10 @@
-import 'package:chargpt/services/injection.dart';
-import 'package:chargpt/states/chat_ui_state.dart';
-import 'package:chargpt/states/message_state.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../models/message.dart';
+import '../services/injection.dart';
+import '../states/chat_ui_state.dart';
+import '../states/message_state.dart';
 
 class ChatScreen extends HookConsumerWidget {
   final _textController = TextEditingController();
