@@ -18,18 +18,35 @@ class UserInputWidget extends HookConsumerWidget {
     final textController = TextEditingController();
 
     return TextField(
-      enabled: !chatUiState.requestLoading, // 处于请求未响应状态，输入框静止
+      // enabled: !chatUiState.requestLoading, // 处于请求未响应状态，输入框静止
       controller: textController,
       decoration: InputDecoration(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
           hintText: 'Type a message', // 显示在输入框的提示文字
-          suffixIcon: IconButton(
-            onPressed: () {
-              // 发送用户消息
-              if(textController.text.isNotEmpty) {
-                _sentMessage(ref, textController);
-              }
-            },
-            icon: const Icon(Icons.send),
+          suffixIcon: SizedBox(
+            width: 40,
+            child: chatUiState.requestLoading ?
+              const Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
+                ),
+              ) :
+            IconButton(
+              onPressed: () {
+                // 发送用户消息
+                if(textController.text.trim().isNotEmpty) {
+                  _sentMessage(ref, textController);
+                }
+              },
+              icon: const Icon(Icons.send),
+            )
           )
       ),
     );
