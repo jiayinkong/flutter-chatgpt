@@ -16,13 +16,6 @@ class ChatScreen extends HookConsumerWidget {
       appBar: AppBar(
         title: const Text('Chat'),
         actions: [
-          // 新建会话
-          IconButton(
-            onPressed: () {
-              ref.read(sessionStateNotifierProvider.notifier).setActiveSession(null);
-            },
-            icon: const Icon(Icons.add),
-          ),
           // 查看会话历史
           IconButton(
             onPressed: () {
@@ -30,20 +23,30 @@ class ChatScreen extends HookConsumerWidget {
             },
             icon: const Icon(Icons.history),
           ),
+          // 新建会话
+          IconButton(
+            onPressed: () {
+              ref.read(sessionStateNotifierProvider.notifier).setActiveSession(null);
+            },
+            icon: const Icon(Icons.add),
+          ),
         ],
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            // 消息列表
-            Expanded(
-              child: ChatMessageList(),
-            ),
+      body: Container(
+        color: const Color(0xFFF1F1F1),
+        child: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              // 消息列表
+              Expanded(
+                child: ChatMessageList(),
+              ),
 
-            // 聊天输入框
-            UserInputWidget(),
-          ],
+              // 聊天输入框
+              UserInputWidget(),
+            ],
+          ),
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:markdown_widget/config/markdown_generator.dart';
 
@@ -27,20 +28,82 @@ class ChatMessageList extends HookConsumerWidget {
     return ListView.separated(
       controller: listController, // 添加列表控件以控制内容的显示
       itemBuilder: (context, index) {
-        return MessageItem(message: messages[index]);
+        final msg = messages[index];
+        return msg.isUser ?
+          SentMessageItem(
+            message: msg,
+            backgroundColor: const Color(0xFF8FE869),
+          ) :
+          ReceivedMessageItem(message: msg);
       },
       itemCount: messages.length,
       separatorBuilder: (context, index) => const Divider(
         height: 16,
+        color: Colors.transparent,
       ),
     );
   }
 }
 
-class MessageItem extends StatelessWidget {
-  const MessageItem({
+class SentMessageItem extends StatelessWidget {
+  final Color backgroundColor;
+  final double radius;
+
+  const SentMessageItem({
     super.key,
     required this.message,
+    this.backgroundColor = Colors.white,
+    this.radius = 8,
+  });
+
+  final Message message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Flexible(
+          child: Container(
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(radius),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            margin: const EdgeInsets.only(left: 48),
+            child: MessageContentWidget(
+              message: message,
+            ),
+          ),
+        ),
+        CustomPaint(
+          painter: Triangle(backgroundColor),
+        ),
+        const SizedBox(width: 8,),
+        const CircleAvatar(
+          backgroundColor: Colors.blue,
+          child: Text(
+            'A',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class ReceivedMessageItem extends StatelessWidget {
+  final Color backgroundColor;
+  final double radius;
+
+  const ReceivedMessageItem({
+    super.key,
+    required this.message,
+    this.backgroundColor = Colors.white,
+    this.radius = 8,
   });
 
   final Message message;
@@ -52,19 +115,27 @@ class MessageItem extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         CircleAvatar(
-          backgroundColor: message.isUser ?
-          Colors.blue : Colors.grey,
-          child: Text(
-              message.isUser ? 'A' : 'GPT'
+          backgroundColor: Colors.white,
+          child: Container(
+            color: Colors.transparent,
+            child: SvgPicture.asset('assets/images/chatgpt.svg'),
           ),
         ),
         const SizedBox(
           width: 8,
         ),
+        CustomPaint(
+          painter: Triangle(backgroundColor),
+        ),
         Flexible(
             child: Container(
-                margin: const EdgeInsets.only(right: 48),
-                child: MessageContentWidget(message: message)
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(radius),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              margin: const EdgeInsets.only(right: 48),
+              child: MessageContentWidget(message: message)
             )
         ),
       ],
@@ -93,5 +164,27 @@ class MessageContentWidget extends StatelessWidget {
           ]
       ).buildWidgets(message.content),
     );
+  }
+}
+
+class Triangle extends CustomPainter {
+  final Color bgColor;
+
+  Triangle(this.bgColor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()..color = bgColor;
+
+    var path = Path();
+    path.lineTo(-5, 0);
+    path.lineTo(0, 10);
+    path.lineTo(5, 0);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
   }
 }
