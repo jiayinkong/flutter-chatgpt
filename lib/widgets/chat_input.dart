@@ -79,19 +79,13 @@ class UserInputWidget extends HookConsumerWidget {
     int? sessionId,
   }) async {
     ref.read(chatUiStateProvider.notifier).setRequestLoading(true);
+    final messages = ref.watch(activeSessionMessagesProvider);
     try {
       final id = uuid.v4();
       // 使 gpt 的消息以流的形式响应回来
       await chatgpt.streamChat(
-          content,
+          messages,
           onSuccess: (text) {
-            // final message = Message(
-            //   id: id,
-            //   content: text,
-            //   timestamp: DateTime.now(),
-            //   isUser: false,
-            // );
-
             final message = _createMessage(text, id: id, isUser: false, sessionId: sessionId);
 
             ref.read(messageProvider.notifier).upsertMessage(message);
