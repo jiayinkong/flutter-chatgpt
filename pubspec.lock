@@ -416,6 +416,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.2"
+  go_router:
+    dependency: "direct main"
+    description:
+      name: go_router
+      sha256: c247a4f76071c3b97bb5ae8912968870d5565644801c5e09f3bc961b4d874895
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "12.1.1"
   graphs:
     dependency: transitive
     description:
@@ -680,6 +688,22 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.3.4"
+  riverpod_annotation:
+    dependency: "direct main"
+    description:
+      name: riverpod_annotation
+      sha256: "02c9bced96ed3ed8d9970820d1ce7b16600955bc01aa8b2276f09dd3d9d29ed9"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.3.2"
+  riverpod_generator:
+    dependency: "direct dev"
+    description:
+      name: riverpod_generator
+      sha256: "5b36ad2f2b562cffb37212e8d59390b25499bf045b732276e30a207b16a25f61"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.3.3"
   riverpod_lint:
     dependency: "direct dev"
     description:

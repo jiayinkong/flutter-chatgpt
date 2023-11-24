@@ -15,4 +15,8 @@ abstract class MessageDao {
 
   @delete
   Future<void> deleteMessage(Message message);
+
+  // 通过回话 id 来查询所有的消息
+  @Query('SELECT * FROM Message WHERE session_id = :sessionId')
+  Future<List<Message>> findMessagesBySessionId(int sessionId);
 }

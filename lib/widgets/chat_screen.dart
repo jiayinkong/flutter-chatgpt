@@ -1,5 +1,8 @@
+import '/models/session.dart';
+import '/states/session_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:markdown_widget/config/all.dart';
 
@@ -8,6 +11,7 @@ import '../models/message.dart';
 import '../services/injection.dart';
 import '../states/chat_ui_state.dart';
 import '../states/message_state.dart';
+import 'chat_input.dart';
 
 class ChatScreen extends HookConsumerWidget {
 
@@ -18,6 +22,22 @@ class ChatScreen extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat'),
+        actions: [
+          // 新建会话
+          IconButton(
+            onPressed: () {
+              ref.read(sessionStateNotifierProvider.notifier).setActiveSession(null);
+            },
+            icon: const Icon(Icons.add),
+          ),
+          // 查看会话历史
+          IconButton(
+            onPressed: () {
+              GoRouter.of(context).push('/history');
+            },
+            icon: const Icon(Icons.history),
+          ),
+        ],
       ),
       body: const Padding(
         padding: EdgeInsets.all(8.0),
@@ -44,10 +64,11 @@ class ChatMessageList extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final messages = ref.watch(messageProvider); // 获取数据
+    // final messages = ref.watch(messageProvider); // 获取数据
+    final messages = ref.watch(activeSessionMessagesProvider);
     final listController = useScrollController(); // 使用 flutter_hooks 库
 
-    ref.listen(messageProvider, (previous, next) {
+    ref.listen(activeSessionMessagesProvider, (previous, next) {
       Future.delayed(const Duration(milliseconds: 50), () {
         // 消息列表内容增多时，自动滚动，让内容显示在屏幕上
         listController.jumpTo(listController.position.maxScrollExtent);
@@ -125,74 +146,3 @@ class MessageContentWidget extends StatelessWidget {
     );
   }
 }
-
-
-class UserInputWidget extends HookConsumerWidget {
-  const UserInputWidget({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final chatUiState = ref.watch(chatUiStateProvider);
-    final textController = TextEditingController();
-
-    return TextField(
-      enabled: !chatUiState.requestLoading, // 处于请求未响应状态，输入框静止
-      controller: textController,
-      decoration: InputDecoration(
-          hintText: 'Type a message', // 显示在输入框的提示文字
-          suffixIcon: IconButton(
-            onPressed: () {
-              // 发送用户消息
-              if(textController.text.isNotEmpty) {
-                _sentMessage(ref, textController);
-              }
-            },
-            icon: const Icon(Icons.send),
-          )
-      ),
-    );
-  }
-
-  _sentMessage(WidgetRef ref, TextEditingController controller) {
-    final content = controller.text;
-    final message = Message(
-      id: uuid.v4(),
-      content: content,
-      isUser: true,
-      timestamp: DateTime.now(),
-    );
-
-    // 添加用户的提问消息到消息列表
-    ref.read(messageProvider.notifier).upsertMessage(message);
-    controller.clear(); // 清空输入框内容
-
-    // gpt 的回答
-    _requestChatGPT(ref, content);
-  }
-
-  _requestChatGPT(WidgetRef ref, String content) async {
-    ref.read(chatUiStateProvider.notifier).setRequestLoading(true);
-    try {
-      final id = uuid.v4();
-      // 使 gpt 的消息以流的形式响应回来
-      await chatgpt.streamChat(
-          content,
-          onSuccess: (text) {
-            final message = Message(
-              id: id,
-              content: text,
-              timestamp: DateTime.now(),
-              isUser: false,
-            );
-
-            ref.read(messageProvider.notifier).upsertMessage(message);
-          }
-      );
-    } catch(err) {
-      logger.e('requestChatGPT error: $err', error: err);
-    } finally {
-      ref.read(chatUiStateProvider.notifier).setRequestLoading(false);
-    }
-  }
-}
-
