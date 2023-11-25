@@ -1,53 +1,99 @@
 import 'package:chargpt/models/session.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
+import '../utils.dart';
 import '/states/session_state.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ChatHistory extends HookConsumerWidget {
-  const ChatHistory({super.key});
+class ChatHistoryScreen extends StatelessWidget {
+  const ChatHistoryScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: ChatHistoryWindow(),
+    );
+  }
+}
+
+
+class ChatHistoryWindow extends HookConsumerWidget {
+  const ChatHistoryWindow({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(sessionStateNotifierProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('History'),
+    return  Center(
+      child: state.when(
+        data: (state) {
+          return ListView(children: [
+            for(var i in state.sessionList) ChatHistoryItemWidget(i: i),
+          ],);
+        },
+        error: (err, stack) => Text('$err'),
+        loading: () => const CircularProgressIndicator(),
       ),
-      body: Center(
-        // AsyncValue提供了一个when函数，对于不同的状态提供了不同的函数来加载页面
-        child: state.when(
-          data: (state) {
-            return ListView(
-              children: [
-                for(var i in state.sessionList)
-                  ListTile(
-                    title: Row(
-                      children: [
-                        Expanded(child: Text(i.title)),
-                        IconButton(
-                          onPressed: () {
-                            _deleteConfirm(context, ref, i);
-                          },
-                          icon: const Icon(Icons.delete),
-                        )
-                      ],
-                    ),
-                    onTap: () {
-                      ref.read(sessionStateNotifierProvider.notifier).setActiveSession(i);
-                      GoRouter.of(context).pop();
-                    },
-                    selected: state.activeSession?.id == i.id,
-                  )
-              ],
-            );
-          },
-          error: (Object error, StackTrace stackTrace) => Text('$error'),
-          loading: () => const CircularProgressIndicator(),
+    );
+  }
+}
+
+class ChatHistoryItemWidget extends HookConsumerWidget {
+  const ChatHistoryItemWidget({super.key, required this.i});
+
+  final Session i;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(sessionStateNotifierProvider).valueOrNull;
+    final editMode = useState(false);
+    final controller = useTextEditingController();
+    controller.text = i.title;
+
+    return ListTile(
+      title: editMode.value ?
+        Row(
+          children: [
+            Expanded(child: TextField(controller: controller,)),
+            IconButton(
+              onPressed: () {
+                final text = controller.text;
+                if(text.trim().isNotEmpty) {
+                  ref.read(sessionStateNotifierProvider.notifier).upsertSession(i.copyWith(title: text.trim()));
+                  editMode.value = false;
+                }
+              },
+              icon: const Icon(Icons.save),
+            )
+          ],
+        ) :
+        Row(
+          children: [
+            Expanded(child: Text(
+              i.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            )),
+            IconButton(
+              onPressed: () {
+                editMode.value = true;
+              },
+              icon: const Icon(Icons.edit),
+            ),
+            IconButton(
+              onPressed: () {
+                _deleteConfirm(context, ref, i);
+              },
+              icon: const Icon(Icons.delete),
+            )
+          ],
         ),
-      ),
+      onTap: () {
+        ref.read(sessionStateNotifierProvider.notifier).setActiveSession(i);
+        if(!isDesktop()) Navigator.of(context).pop();
+      },
+      selected: state?.activeSession?.id == i.id,
     );
   }
 
@@ -66,6 +112,7 @@ class ChatHistory extends HookConsumerWidget {
           TextButton(
             onPressed: () {
               ref.read(sessionStateNotifierProvider.notifier).deleteSession(session);
+              ref.read(sessionStateNotifierProvider.notifier).setActiveSession(null);
             },
             child: const Text('Delete'),
           )

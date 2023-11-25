@@ -13,31 +13,13 @@ class ChatScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chat'),
-        actions: [
-          // 查看会话历史
-          IconButton(
-            onPressed: () {
-              GoRouter.of(context).push('/history');
-            },
-            icon: const Icon(Icons.history),
-          ),
-          // 新建会话
-          IconButton(
-            onPressed: () {
-              ref.read(sessionStateNotifierProvider.notifier).setActiveSession(null);
-            },
-            icon: const Icon(Icons.add),
-          ),
-        ],
-      ),
       body: Container(
         color: const Color(0xFFF1F1F1),
         child: const Padding(
           padding: EdgeInsets.all(8.0),
           child: Column(
             children: [
+              SizedBox(height: 24),
               // 消息列表
               Expanded(
                 child: ChatMessageList(),
@@ -45,6 +27,7 @@ class ChatScreen extends HookConsumerWidget {
 
               // 聊天输入框
               UserInputWidget(),
+              SizedBox(height: 24,)
             ],
           ),
         ),

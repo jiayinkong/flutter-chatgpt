@@ -1,4 +1,6 @@
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:chargpt/router.dart';
+import 'package:chargpt/utils.dart';
 import 'package:flutter_tiktoken/flutter_tiktoken.dart';
 
 import 'data/database.dart';
@@ -40,6 +42,9 @@ void main() async {
       })
     ]
   ).build();
+
+  initWindow();
+
   runApp(
     const ProviderScope(child: MyApp()),
   );
