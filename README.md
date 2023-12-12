@@ -1,4 +1,3 @@
-<img width="1950" alt="image" src="https://github.com/jiayinkong/flutter-chatgpt/assets/73403506/5abee91f-3625-4663-979c-9d7dcacc439d"><img width="1950" alt="image" src="https://github.com/jiayinkong/flutter-chatgpt/assets/73403506/cbf95abe-a4e6-41d5-a2c8-ef2632426a3c">
 # flutter-chatgpt
 A chat tool developed using the Flutter framework.
 
