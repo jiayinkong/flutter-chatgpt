@@ -16,5 +16,5 @@ A chat tool developed using the Flutter framework.
 ## 聊天记录持久化
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bdb084e1cddd4d32ba394a2a4017567f~tplv-k3u1fbpfcp-watermark.image?)
 
-## 实现 gpt 回答时，input 显示loaing
+## 实现 gpt 回答时，input 显示loading
 ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bf259b1d8862400493bfbfeacafe51a0~tplv-k3u1fbpfcp-watermark.image?)
